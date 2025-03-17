@@ -1,7 +1,6 @@
 using ClassLibrary1;
-using Xunit;
 
-namespace EShop.Application.Tests
+namespace EShop.Application.Tests.Services
 {
     public class CreditCardServiceTests
     {
@@ -31,7 +30,7 @@ namespace EShop.Application.Tests
         public void ValidateCard_CheckLength_ReturnFalse()
         {
             var creditCardService = new CreditCardService();
-            string cardNumber = "1234567890123";
+            string cardNumber = "12345678901235345345435435345345345345";
 
             bool result = creditCardService.ValidateCard(cardNumber);
 

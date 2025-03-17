@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EShopSErvice", "EShopSErvic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EShop.Application", "EShop.Application\EShop.Application.csproj", "{E2E5FFFB-E2AA-4CD7-91B6-7EA1559B79E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EShop.Aplication.Tests", "EShop.Aplication.Tests\EShop.Aplication.Tests.csproj", "{41F7891A-C543-41C8-9BB1-24C0438D2021}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EShop.Application.Tests", "EShop.Application.Tests\EShop.Application.Tests.csproj", "{41F7891A-C543-41C8-9BB1-24C0438D2021}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E5F7A70F-6D70-40E9-A28F-74A497200AB6}"
 EndProject

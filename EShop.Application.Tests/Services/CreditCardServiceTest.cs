@@ -1,4 +1,5 @@
 using ClassLibrary1;
+using EShop.Domain.Exception.CardNumber;
 
 namespace EShop.Application.Tests.Services
 {
@@ -14,40 +15,36 @@ namespace EShop.Application.Tests.Services
 
             Assert.True(result);
         }
-
+        
         [Fact]
-        public void ValidateCard_InvalidCardNumber_ReturnsFalse()
+        public void ValidateCard_ThrowTooLongException()
         {
             var creditCardService = new CreditCardService();
-            string invalidCardNumber = "1234567890123456";
-
-            bool result = creditCardService.ValidateCard(invalidCardNumber);
-
-            Assert.False(result);
+            Assert.Throws<CardNumberTooLongException>(() => creditCardService.ValidateCard("12345631321312323321312312312312"));
+            Assert.Throws<CardNumberTooLongException>(() =>
+                creditCardService.ValidateCard("123123124231423453254354354354353453453453453453"));
         }
-
+        
         [Fact]
-        public void ValidateCard_CheckLength_ReturnFalse()
+        public void ValidateCard_ThrowTooShortException()
         {
             var creditCardService = new CreditCardService();
-            string cardNumber = "12345678901235345345435435345345345345";
-
-            bool result = creditCardService.ValidateCard(cardNumber);
-
-            Assert.False(result);
+            Assert.Throws<CardNumberTooShortException>(() => creditCardService.ValidateCard("1234"));
+            Assert.Throws<CardNumberTooShortException>(() => creditCardService.ValidateCard(""));
+            Assert.Throws<CardNumberTooShortException>(() => creditCardService.ValidateCard("--------------"));
         }
-
+        
         [Fact]
-        public void ValidateCard_EmptyCardNumber_ReturnFalse()
+        public void ValidateCard_ThrowCardNumberInvalidException()
         {
             var creditCardService = new CreditCardService();
-            string cardNumber = "";
+            Assert.Throws<CardNumberInvalidException>(() => creditCardService.ValidateCard("1234dwsdasdasd 1234 1234 1234"));
+            Assert.Throws<CardNumberInvalidException>(() => creditCardService.ValidateCard("g-gfd-gdf-gfd-"));
 
-            bool result = creditCardService.ValidateCard(cardNumber);
-
-            Assert.False(result);
         }
+        
 
+        
         [Fact]
         public void ValidateCard_NonDigitCharacters_ReturnTrue()
         {
@@ -77,7 +74,7 @@ namespace EShop.Application.Tests.Services
             string masterCardNumber = "5555555555554444";
 
             string result = creditCardService.GetCardType(masterCardNumber);
-
+                
             Assert.Equal("MasterCard", result);
         }
         
@@ -98,9 +95,8 @@ namespace EShop.Application.Tests.Services
             var creditCardService = new CreditCardService();
             string discoverCardNumber = "6011111111111117";
 
-            string result = creditCardService.GetCardType(discoverCardNumber);
 
-            Assert.Equal("Discover", result);
+            Assert.Throws<CardNumberInvalidException>(() => creditCardService.GetCardType(discoverCardNumber));
         }
         
         [Fact]
@@ -109,9 +105,8 @@ namespace EShop.Application.Tests.Services
             var creditCardService = new CreditCardService();
             string jcbCardNumber = "3530111333300000";
 
-            string result = creditCardService.GetCardType(jcbCardNumber);
 
-            Assert.Equal("JCB", result);
+            Assert.Throws<CardNumberInvalidException>(() => creditCardService.GetCardType(jcbCardNumber));
         }
         
         [Fact]
@@ -120,9 +115,8 @@ namespace EShop.Application.Tests.Services
             var creditCardService = new CreditCardService();
             string dinersClubCardNumber = "30569309025904";
 
-            string result = creditCardService.GetCardType(dinersClubCardNumber);
 
-            Assert.Equal("Diners Club", result);
+            Assert.Throws<CardNumberInvalidException>(() => creditCardService.GetCardType(dinersClubCardNumber));
         }
         
         [Fact]
@@ -130,22 +124,11 @@ namespace EShop.Application.Tests.Services
         {
             var creditCardService = new CreditCardService();
             string maestroCardNumber = "6759649826438453";
-
-            string result = creditCardService.GetCardType(maestroCardNumber);
-
-            Assert.Equal("Maestro", result);
+            
+            Assert.Throws<CardNumberInvalidException>(() => creditCardService.GetCardType(maestroCardNumber));
         }
         
-        [Fact]
-        public void GetCardType_UnknownCardNumber_ReturnsUnknown()
-        {
-            var creditCardService = new CreditCardService();
-            string unknownCardNumber = "1234567890123456";
 
-            string result = creditCardService.GetCardType(unknownCardNumber);
-
-            Assert.Equal("Unknown", result);
-        }
 
         [Theory]
         [InlineData("American Express", "349779658312797")]

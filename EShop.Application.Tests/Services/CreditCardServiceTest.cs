@@ -90,7 +90,7 @@ namespace EShop.Application.Tests.Services
         }
         
         [Fact]
-        public void GetCardType_DiscoverCardNumber_ReturnsDiscover()
+        public void GetCardType_DiscoverCardNumber_ThrowsCardNumberInvalidException()
         {
             var creditCardService = new CreditCardService();
             string discoverCardNumber = "6011111111111117";
@@ -100,7 +100,7 @@ namespace EShop.Application.Tests.Services
         }
         
         [Fact]
-        public void GetCardType_JCBCardNumber_ReturnsJCB()
+        public void GetCardType_JCBCardNumber_ThrowsCardNumberInvalidException()
         {
             var creditCardService = new CreditCardService();
             string jcbCardNumber = "3530111333300000";
@@ -110,7 +110,7 @@ namespace EShop.Application.Tests.Services
         }
         
         [Fact]
-        public void GetCardType_DinersClubCardNumber_ReturnsDinersClub()
+        public void GetCardType_DinersClubCardNumber_ThrowsCardNumberInvalidException()
         {
             var creditCardService = new CreditCardService();
             string dinersClubCardNumber = "30569309025904";

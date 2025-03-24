@@ -21,15 +21,15 @@ public class CreditCardController : ControllerBase
         }
         catch (CardNumberInvalidException )
         {
-            return BadRequest(new { code = HttpStatusCode.NotAcceptable});
+            return StatusCode(406 ,new { code = HttpStatusCode.NotAcceptable});
         }
         catch (CardNumberTooShortException e)
         {
-            return BadRequest(new { Error = e.Message, code = HttpStatusCode.BadRequest });
+            return StatusCode(400 ,new { Error = e.Message, code = HttpStatusCode.BadRequest });
         }
         catch (CardNumberTooLongException e)
         {
-            return BadRequest(new { Error = e.Message, code = HttpStatusCode.RequestedRangeNotSatisfiable });
+            return StatusCode(414 ,new { Error = e.Message, code = HttpStatusCode.RequestUriTooLong });
         }
       
     }

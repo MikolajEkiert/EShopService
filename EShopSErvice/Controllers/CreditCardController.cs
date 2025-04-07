@@ -1,52 +1,145 @@
-using System.Net;
 using ClassLibrary1;
-using Microsoft.AspNetCore.Mvc;
+using Eshop.Application;
+using EShop.Domain.Enums;
 using EShop.Domain.Exception.CardNumber;
+using EShop.Domain.Models;
+using Microsoft.AspNetCore.Mvc;
 
-namespace EShopService.Controllers;
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-[ApiController]
-[Route("api/[controller]")]
-public class CreditCardController : ControllerBase
+namespace EShopService.Controllers
 {
-    private readonly CreditCardService _creditCardService = new();
-
-    [HttpPost("validate/{cardNumber}")]
-    public IActionResult ValidateCardNumber([FromRoute] string cardNumber)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CreditCardController : ControllerBase
     {
-        try
+        private readonly ICreditCardService creditCardService;
+        private readonly IProductService productService;
+
+        public CreditCardController(ICreditCardService _creditCardService, IProductService _productService)
         {
-            bool isValid = _creditCardService.ValidateCard(cardNumber);
-            return Ok(new { Valid = isValid });
+            creditCardService = _creditCardService;
+            productService = _productService;
         }
-        catch (CardNumberInvalidException )
+        // GET: api/<CreditCardController>
+        [HttpGet("verifyCreditCard")]
+        public IActionResult VerifyCard([FromQuery] string cardNumber)
         {
-            return StatusCode(406 ,new { code = HttpStatusCode.NotAcceptable});
+            try
+            {
+                bool isValid = creditCardService.ValidateCard(cardNumber);
+
+                string cardType = creditCardService.GetCardType(cardNumber);
+                if (Enum.TryParse<CreditCardProviders>(cardType, true, out _))
+                {
+                    return Ok(new { IsValid = isValid, CardType = cardType });
+                }
+                else
+                {
+                    return StatusCode(406, new { Error = "Card type not supported" });
+                }
+            }
+            catch (CardNumberTooShortException ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+            catch (CardNumberTooLongException ex)
+            {
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (CardNumberInvalidException ex)
+            {
+                return StatusCode(400, new { Error = ex.Message });
+            }
         }
-        catch (CardNumberTooShortException e)
+        [HttpGet("getProductByID")]
+        public IActionResult GetProductByID([FromQuery] int productID)
         {
-            return StatusCode(400 ,new { Error = e.Message, code = HttpStatusCode.BadRequest });
+            try
+            {
+                var product = productService.GetProduct(productID);
+                if (product == null)
+                {
+                    return NotFound(new { Error = "product not found" });
+                }
+                return Ok(product);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { Error = "prodcut  not found" });
+            }
+
         }
-        catch (CardNumberTooLongException e)
+        [HttpGet("deleteProductByID")]
+        public IActionResult DeleteProductByID([FromQuery] int productID)
         {
-            return StatusCode(414 ,new { Error = e.Message, code = HttpStatusCode.RequestUriTooLong });
+            try
+            {
+                bool deleted = productService.DeleteProduct(productID);
+                if (deleted)
+                {
+                    return Ok();
+                }
+                return NotFound(new { Error = "product not found" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { Error = "product not found" });
+            }
+
         }
-      
+        [HttpGet("getAllProducts")]
+        public IActionResult GetAllProducts()
+        {
+            try
+            {
+                var products = productService.GetProducts();
+                if (!products.Any())
+                {
+                    return Ok(new { Message = "no products found" });
+
+                }
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = "an error occurred while retrieving products" });
+            }
+        }
+        [HttpPost("addProduct")]
+        public IActionResult AddProduct([FromBody] Product product)
+        {
+            try
+            {
+                if (product == null)
+                {
+                    return BadRequest(new { Error = "product data is invalid" });
+                }
+                productService.AddProduct(product);
+
+
+                return CreatedAtAction(nameof(GetProductByID), new { productID = product.Id }, product);
+            }
+            catch (Exception ex) {
+                return StatusCode(500, new { Error = "an error occurred while adding the product" });
+            }
+        }
+        [HttpPost("updateProduct")]
+        public IActionResult UpdateProduct([FromBody] Product? product)
+        {
+            try
+            {
+                if (product == null)
+                {
+                    return BadRequest(new { Error = "product data is invalid" });
+                }
+                productService.UpdateProduct(product);
+                return Ok(new { Message = "product updated" });
+            }
+            catch (Exception ex) {
+                return StatusCode(500, new { Error = "an error occurred while updating the product" });
+            }
+
+        }
     }
-
-    [HttpPost("getCardType/{cardNumber}")]
-    public IActionResult GetCardType([FromRoute] string cardNumber)
-    {
-        try
-        {
-            string validCardProvider = _creditCardService.GetCardType(cardNumber);
-            return Ok(new { Valid = validCardProvider });
-        }
-        catch (CardNumberInvalidException )
-        {
-            return BadRequest(new {  code = HttpStatusCode.NotAcceptable });
-        }
-    }
-
-
 }
